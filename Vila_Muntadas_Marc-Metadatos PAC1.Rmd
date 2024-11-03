@@ -1,0 +1,70 @@
+---
+title: "Metadades PAC1"
+author: "Marc Vila Muntadas"
+date: "2024-11-03"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Metadades del conjunt de dades dades_fosforilacio
+
+## Introducció
+
+El conjunt de dades **dades_fosforilacio** s'ha generat a partir d'anàlisis mitjançant espectrometria de masses, una tècnica que permet identificar i quantificar les modificacions post-traduccionals (PTMs) en proteïnes. Aquestes modificacions són canvis que es produeixen en les proteïnes després de la seva síntesi i són fonamentals per a la regulació de diverses funcions biològiques en els organismes.
+
+## Descripció General
+
+El conjunt de dades inclou observacions sobre diverses modificacions de proteïnes en dues condicions experimentals específiques:
+- **MSS**: Model d'estudi de sang, que simula un entorn sanguini normal.
+- **PD**: Model de malaltia de parkinson, que simula condicions relacionades amb aquesta malaltia.
+
+## Estructura dels dades
+
+El conjunt de dades està organitzat en una taula que conté un total de 1438 files i 18 columnes. Cada fila representa una observació específica d'una modificació de proteïna, mentre que les columnes contenen diferents tipus d'informació sobre aquestes observacions.
+
+### Detall de les variables
+
+A continuació, es descriuen cadascuna de les variables presents en el conjunt de dades:
+
+1.SequenceModifications: Aquesta columna detalla el tipus de modificació que ha ocorregut en la seqüència d'aminoàcids de la proteïna. Per exemple, pot indicar si ha tingut lloc una fosforilació, acetilació, etc.
+
+2. Accession: Aquest és un identificador únic assignat a cada proteïna en les bases de dades de proteïnes. Per exemple, un identificador podria ser "O00560".
+
+3. Description: Aquí es proporciona una descripció detallada de la proteïna, que inclou el seu nom i l'organisme del qual prové.
+
+4. Score: Aquest valor numèric representa la qualitat de la identificació de la modificació. Com més alt sigui el puntuació, més gran serà la confiança que la modificació ha estat identificada correctament.
+
+5. CLASS: Aquesta variable classifica la modificació segons certs criteris. Per exemple, "H" podria indicar que la modificació és de alta qualitat.
+
+6. PHOSPHO: Aquesta columna indica si la modificació detectada és una fosforilació. Es representa amb "Y" (sí) si la modificació és una fosforilació, i pot estar en blanc si no ho és.
+
+### Dades de la Taula
+
+Les columnes addicionals de la taula representen diferents mostres de proteïnes. Cada cel·la d'aquestes columnes conté dades numèriques que reflecteixen la intensitat de la senyal de les modificacions detectades.
+
+### Resum de les Mostres
+
+El conjunt de dades es divideix en dos grups principals:
+
+- Grup MSS: Aquest grup inclou totes les mostres que s'han recollit en condicions normals, relacionades amb el model d'estudi de sang. És útil per establir una línia base de comparació.
+  
+- Grup PD: Aquest grup comprèn mostres que s'han recollit sota condicions relacionades amb la malaltia de Parkinson. Analitzar aquestes mostres ajuda a identificar canvis en les modificacions de proteïnes que poden estar associats amb la malaltia.
+
+## Informació sobre el Preprocessament
+
+- Eliminació de valors perduts: S'han eliminat les observacions que contenien dades faltants per assegurar que els anàlisis posteriors fossin precisos.
+
+- Normalització de les intensitats de les senyals: Les intensitats de les senyals s'han normalitzat per fer comparacions més equitatives entre les diferents mostres i condicions.
+
+Aquest preprocessament és essencial per garantir que els resultats obtinguts de l'anàlisi siguin fiables i vàlids.
+
+```
+
+
+
+
+

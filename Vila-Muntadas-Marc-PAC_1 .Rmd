@@ -1,0 +1,170 @@
+---
+title: "PAC 1"
+author: "Marc Vila Muntadas"
+date: "2024-10-28"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+# Carregar la llibreria necessària
+install.packages("readxl")
+library(readxl)
+
+# Llegir el fitxer Excel
+dades_fosforilacio <- read_excel("C:/Users/marcv/Documents/UOC/MASTER EN BIOINFORMÀTICA I BIOESTADÍSTICA/Anàlisis de dades omiques/PAC 1/TIO2+PTYR-human-MSS+MSIvsPD.XLSX")
+
+# Mostrar les primeres files de la base de dades
+head(dades_fosforilacio)
+View(dades_fosforilacio)
+```
+
+```{r}
+# Comprovar i instal·lar Bioconductor si no està instal·lat
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("SummarizedExperiment")
+```
+
+```{r}
+# Extraure les dades numèriques del fitxer
+matriu_dades <- as.matrix(dades_fosforilacio[, grep("M\\d+_\\d+_(MSS|PD)", colnames(dades_fosforilacio))])
+
+# Crear un data frame amb les metadades de les files
+metadades_files <- dades_fosforilacio[, c("SequenceModifications", "Accession", "Description", "Score", "CLASS", "PHOSPHO")]
+
+# Crear un data frame amb les metadades de les columnes (mostres)
+metadades_mostres <- data.frame(
+  IDMostra = colnames(matriu_dades),
+  Grup = ifelse(grepl("MSS", colnames(matriu_dades)), "MSS", "PD")
+)
+```
+
+```{r}
+# Crear l'objecte SummarizedExperiment
+experiment_fosforilacio <- SummarizedExperiment(
+  assays = list(counts = matriu_dades),
+  rowData = metadades_files,
+  colData = metadades_mostres
+)
+
+# Veure un resum de l'objecte creat
+experiment_fosforilacio
+
+# Dimensions de les dades
+dim(matriu_dades)
+dim(metadades_files)
+dim(metadades_mostres)
+
+# Mostrar les primeres files de la matriu de dades
+head(matriu_dades)
+summary(matriu_dades)
+```
+
+```{r}
+# Mostrar les primeres files de les dades d'assay
+head(assay(experiment_fosforilacio))
+
+# Resum de metadades de les files (proteïnes)
+head(rowData(experiment_fosforilacio))
+
+# Resum de metadades de les columnes (mostres)
+colData(experiment_fosforilacio)
+```
+
+```{r}
+# Guardar l'objecte SummarizedExperiment en un fitxer .Rda
+save(experiment_fosforilacio, file = "dades_fosforilacio_SE.Rda")
+```
+
+```{r}
+# Calcular estadístiques bàsiques per a les mesures
+summary(assay(experiment_fosforilacio))
+```
+
+```{r}
+# Histograma de les mesures de fosforilació
+hist(as.numeric(assay(experiment_fosforilacio)), main = "Distribució de les Mesures de Fosforilació", xlab = "Intensitat de Fosforilació", col = "lightblue")
+
+# Boxplot de les mesures per mostra
+boxplot(assay(experiment_fosforilacio), main = "Distribució de Fosforilació per Mostra", ylab = "Intensitat de Fosforilació", las = 2, col = "lightgreen")
+```
+
+```{r}
+# Extraure dades de fosforilació per grup
+dades_mss <- assay(experiment_fosforilacio)[, colData(experiment_fosforilacio)$Grup == "MSS"]
+dades_pd <- assay(experiment_fosforilacio)[, colData(experiment_fosforilacio)$Grup == "PD"]
+
+# Calcular mitjana i variància per grup
+mitjana_mss <- rowMeans(dades_mss, na.rm = TRUE)
+mitjana_pd <- rowMeans(dades_pd, na.rm = TRUE)
+
+# Comparació de la mitjana entre MSS i PD
+boxplot(mitjana_mss, mitjana_pd, names = c("MSS", "PD"), main = "Comparació de Mitjanes entre Grups", ylab = "Mitjana de Fosforilació")
+```
+
+```{r}
+# Guardar de nou l'objecte SummarizedExperiment en un fitxer .Rda
+# Especificar la ruta a la carpeta de PAC 1
+ruta_pac1 <- "C:/Users/marcv/Documents/UOC/MASTER EN BIOINFORMÀTICA I BIOESTADÍSTICA/Anàlisis de dades omiques/PAC 1/"
+
+# Guardar de nou l'objecte SummarizedExperiment en un fitxer .Rda a la carpeta de PAC 1
+save(experiment_fosforilacio, file = paste0(ruta_pac1, "dades_fosforilacio_SE.Rda"))
+
+```
+
+```{r}
+# Comptar el total de valors NA en la matriu de dades
+sum(is.na(matriu_dades))  
+```
+
+```{r}
+# Comparació de mitjanes entre els grups MSS i PD utilitzant la prova t de Welch
+
+# 1. Calcular la mitjana de les intensitats de fosforilació per al grup MSS
+mitjanes_mss <- rowMeans(dades_mss, na.rm = TRUE)
+
+# 2. Calcular la mitjana de les intensitats de fosforilació per al grup PD
+mitjanes_pd <- rowMeans(dades_pd, na.rm = TRUE)
+
+# 3. Realitzar la prova t de Welch per comparar les mitjanes entre els dos grups
+resultats_t_test <- t.test(mitjanes_mss, mitjanes_pd)
+
+print(resultats_t_test)
+```
+
+```{r}
+# Calcular les mitjanes i desviacions estàndard per a MSS i PD
+mitjana_mss <- rowMeans(dades_mss, na.rm = TRUE)
+mitjana_pd <- rowMeans(dades_pd, na.rm = TRUE)
+sd_mss <- apply(dades_mss, 1, sd, na.rm = TRUE)
+sd_pd <- apply(dades_pd, 1, sd, na.rm = TRUE)
+
+# Resum de les mitjanes
+summary(mitjana_mss)
+summary(mitjana_pd)
+```
+
+```{r}
+# Realitzar la prova t de Welch i la prova de Wilcoxon
+resultats_t_test <- t.test(mitjana_mss, mitjana_pd)
+resultats_wilcox <- wilcox.test(mitjana_mss, mitjana_pd)
+```
+
+```{r}
+# Escriure les dades a un fitxer CSV
+write.csv(dades_fosforilacio, "dades.csv", row.names = FALSE)
+```
+
+```{r}
+# Comptar el nombre de files i columnes de la base de dades
+nrow(dades_fosforilacio) 
+ncol(dades_fosforilacio)
+```
+
+
